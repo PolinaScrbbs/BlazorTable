@@ -1,0 +1,121 @@
+﻿@page "/"
+@using BlazorTable.Components.Models
+
+<PageTitle>Home</PageTitle>
+
+<style>
+    .form-control:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
+    }
+</style>
+
+@code {
+    private List<ElementType> _elementTypes;
+    private Dictionary<ElementType, List<string>> _elementsByType;
+    private int _maxRows;
+    private string _searchTerm = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _elementTypes = new List<ElementType>()
+        {
+            new ElementType("IPv4"),
+            new ElementType("IPv6"),
+            new ElementType("Mac"),
+            new ElementType("Text")
+        };
+
+        var allElements = new List<Element>()
+        {
+            new Element("192.168.1.1", _elementTypes[0]),
+            new Element("10.0.0.1", _elementTypes[0]),
+            new Element("172.16.0.5", _elementTypes[0]),
+            new Element("8.8.8.8", _elementTypes[0]),
+            new Element("203.0.113.42", _elementTypes[0]),
+
+            new Element("2001:0db8:85a3:0000:0000:8a2e:0370:7334", _elementTypes[1]),
+            new Element("fe80::1", _elementTypes[1]),
+            new Element("2001:4860:4860::8888", _elementTypes[1]),
+            new Element("fd12:3456:789a:1::1", _elementTypes[1]),
+            new Element("::1", _elementTypes[1]),
+
+            new Element("00:1A:2B:3C:4D:5E", _elementTypes[2]),
+            new Element("AA:BB:CC:DD:EE:FF", _elementTypes[2]),
+            new Element("00-14-22-01-23-45", _elementTypes[2]),
+            new Element("3C:97:0E:12:34:56", _elementTypes[2]),
+            new Element("FC:FB:FB:01:FA:21", _elementTypes[2]),
+
+            new Element("Привет", _elementTypes[3]),
+            new Element("Hola", _elementTypes[3]),
+            new Element("Bonjour", _elementTypes[3]),
+            new Element("Hallo", _elementTypes[3]),
+            new Element("こんにちは", _elementTypes[3]),
+        };
+
+        _elementsByType = _elementTypes.ToDictionary(
+            type => type,
+            type => allElements.Where(e => e.Type == type).Select(e => e.Title).ToList()
+        );
+
+        _maxRows = _elementsByType.Values.Max(list => list.Count);
+    }
+
+
+    private Dictionary<ElementType, List<string>> FilteredElementsByType
+    {
+        get
+        {
+            return _elementsByType.ToDictionary(
+                type => type.Key,
+                type => type.Value.Where(e => e.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)).ToList()
+            );
+        }
+    }
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Input</span>
+                </div>
+                <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" @bind="_searchTerm">
+            </div>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-dark w-100">Find</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var elementType in _elementTypes)
+                {
+                    <th scope="col">@elementType.Title</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int row = 0; row < _maxRows; row++)
+            {
+                <tr>
+                    @foreach (var elementType in _elementTypes)
+                    {
+                        <td>
+                            @{
+                                var elements = FilteredElementsByType[elementType];
+                            }
+                            @if (row < elements.Count)
+                            {
+                                @elements[row]
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
