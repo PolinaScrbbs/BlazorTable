@@ -1,4 +1,5 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 @using BlazorTable.Components.Models
 
 <PageTitle>Home</PageTitle>
@@ -15,18 +16,24 @@
     private Dictionary<ElementType, List<string>> _elementsByType;
     private int _maxRows;
     private string _searchTerm = string.Empty;
+    private List<Element> allElements;
 
     protected override void OnInitialized()
     {
-        _elementTypes = new List<ElementType>()
-        {
+        _elementTypes = new List<ElementType>() {
             new ElementType("IPv4"),
             new ElementType("IPv6"),
             new ElementType("Mac"),
             new ElementType("Text")
         };
 
-        var allElements = new List<Element>()
+        InitializeElements();
+        ApplyFilters(); 
+    }
+
+    private void InitializeElements()
+    {
+        allElements = new List<Element>()
         {
             new Element("192.168.1.1", _elementTypes[0]),
             new Element("10.0.0.1", _elementTypes[0]),
@@ -52,26 +59,27 @@
             new Element("Hallo", _elementTypes[3]),
             new Element("こんにちは", _elementTypes[3]),
         };
+    }
 
+    private void ApplyFilters()
+    {
         _elementsByType = _elementTypes.ToDictionary(
             type => type,
-            type => allElements.Where(e => e.Type == type).Select(e => e.Title).ToList()
+            type => allElements
+                .Where(e => e.Type == type)
+                .Select(e => e.Title)
+                .ToList()
         );
 
         _maxRows = _elementsByType.Values.Max(list => list.Count);
     }
 
-
-    private Dictionary<ElementType, List<string>> FilteredElementsByType
-    {
-        get
-        {
-            return _elementsByType.ToDictionary(
-                type => type.Key,
-                type => type.Value.Where(e => e.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)).ToList()
-            );
-        }
-    }
+    private Dictionary<ElementType, List<string>> FilteredElementsByType => 
+        _elementsByType.ToDictionary(
+            type => type.Key,
+            type => type.Value.Where(e => string.IsNullOrWhiteSpace(_searchTerm) || e.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)).ToList()
+        );
+    
 }
 
 <div class="container">
@@ -81,41 +89,44 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="inputGroup-sizing-default">Input</span>
                 </div>
-                <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" @bind="_searchTerm">
+                <input type="text" class="form-control"
+                       aria-label="Default"
+                       aria-describedby="inputGroup-sizing-default"
+                       @bind-value="_searchTerm"/>
             </div>
         </div>
         <div class="col-2">
-            <button type="button" class="btn btn-dark w-100">Find</button>
+            <button type="button" class="btn btn-dark w-100" @onclick="ApplyFilters">Find</button>
         </div>
     </div>
-
+    
     <table class="table">
         <thead>
+        <tr>
+            @foreach (var elementType in _elementTypes)
+            {
+                <th scope="col">@elementType.Title</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @for (int row = 0; row < _maxRows; row++)
+        {
             <tr>
                 @foreach (var elementType in _elementTypes)
                 {
-                    <th scope="col">@elementType.Title</th>
+                    <td>
+                        @{
+                            var elements = FilteredElementsByType[elementType];
+                        }
+                        @if (row < elements.Count)
+                        {
+                            @elements[row]
+                        }
+                    </td>
                 }
             </tr>
-        </thead>
-        <tbody>
-            @for (int row = 0; row < _maxRows; row++)
-            {
-                <tr>
-                    @foreach (var elementType in _elementTypes)
-                    {
-                        <td>
-                            @{
-                                var elements = FilteredElementsByType[elementType];
-                            }
-                            @if (row < elements.Count)
-                            {
-                                @elements[row]
-                            }
-                        </td>
-                    }
-                </tr>
-            }
+        }
         </tbody>
     </table>
 </div>
