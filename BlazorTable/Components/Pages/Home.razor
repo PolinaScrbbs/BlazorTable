@@ -117,11 +117,16 @@
                 {
                     <td>
                         @{
-                            var elements = FilteredElementsByType[elementType];
+                            var elements = FilteredElementsByType[elementType]
+                                .Select(title => allElements.First(e => e.Title == title))
+                                .ToList();
                         }
                         @if (row < elements.Count)
                         {
-                            @elements[row]
+                            var element = elements[row];
+                            <span style="color: @(element.IsValidated ? "black" : "red")">
+                        @element.Title
+                    </span>
                         }
                     </td>
                 }
