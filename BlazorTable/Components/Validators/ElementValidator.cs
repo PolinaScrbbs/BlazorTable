@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using BlazorTable.Components.Models;
 
@@ -6,8 +7,9 @@ namespace BlazorTable.Components.Validators;
 
 public class ElementValidator
 {
-    private static readonly Regex MacAddressRegex = new(@"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", RegexOptions.Compiled);
-    
+    private static readonly Regex MacAddressRegex =
+        new(@"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", RegexOptions.Compiled);
+
     public static bool Validate(string value, ElementType type)
     {
         return type.Title switch
@@ -22,12 +24,12 @@ public class ElementValidator
 
     private static bool ValidateIPv4(string value)
     {
-        return IPAddress.TryParse(value, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
+        return IPAddress.TryParse(value, out var address) && address.AddressFamily == AddressFamily.InterNetwork;
     }
 
     private static bool ValidateIPv6(string value)
     {
-        return IPAddress.TryParse(value, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6;
+        return IPAddress.TryParse(value, out var address) && address.AddressFamily == AddressFamily.InterNetworkV6;
     }
 
     private static bool ValidateMac(string value)

@@ -1,6 +1,6 @@
 ﻿@page "/"
-@rendermode InteractiveServer
 @using BlazorTable.Components.Models
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
@@ -20,44 +20,45 @@
 
     protected override void OnInitialized()
     {
-        _elementTypes = new List<ElementType>() {
-            new ElementType("IPv4"),
-            new ElementType("IPv6"),
-            new ElementType("Mac"),
-            new ElementType("Text")
+        _elementTypes = new List<ElementType>
+        {
+            new("IPv4"),
+            new("IPv6"),
+            new("Mac"),
+            new("Text")
         };
 
         InitializeElements();
-        ApplyFilters(); 
+        ApplyFilters();
     }
 
     private void InitializeElements()
     {
-        allElements = new List<Element>()
+        allElements = new List<Element>
         {
-            new Element("192.168.1.1", _elementTypes[0]),
-            new Element("10.0.0.1", _elementTypes[0]),
-            new Element("172.16.0.5", _elementTypes[0]),
-            new Element("8.8.8.8", _elementTypes[0]),
-            new Element("203.0.113.42", _elementTypes[0]),
+            new("192.168.1.1", _elementTypes[0]),
+            new("10.0.0.1", _elementTypes[0]),
+            new("172.16.0.5", _elementTypes[0]),
+            new("8.8.8.8", _elementTypes[0]),
+            new("203.0.113.42", _elementTypes[0]),
 
-            new Element("2001:0db8:85a3:0000:0000:8a2e:0370:7334", _elementTypes[1]),
-            new Element("fe80::1", _elementTypes[1]),
-            new Element("2001:4860:4860::8888", _elementTypes[1]),
-            new Element("fd12:3456:789a:1::1", _elementTypes[1]),
-            new Element("::1", _elementTypes[1]),
+            new("2001:0db8:85a3:0000:0000:8a2e:0370:7334", _elementTypes[1]),
+            new("fe80::1", _elementTypes[1]),
+            new("2001:4860:4860::8888", _elementTypes[1]),
+            new("fd12:3456:789a:1::1", _elementTypes[1]),
+            new("::1", _elementTypes[1]),
 
-            new Element("00:1A:2B:3C:4D:5E", _elementTypes[2]),
-            new Element("AA:BB:CC:DD:EE:FF", _elementTypes[2]),
-            new Element("00-14-22-01-23-45", _elementTypes[2]),
-            new Element("3C:97:0E:12:34:56", _elementTypes[2]),
-            new Element("FC:FB:FB:01:FA:21", _elementTypes[2]),
+            new("00:1A:2B:3C:4D:5E", _elementTypes[2]),
+            new("AA:BB:CC:DD:EE:FF", _elementTypes[2]),
+            new("00-14-22-01-23-45", _elementTypes[2]),
+            new("3C:97:0E:12:34:56", _elementTypes[2]),
+            new("FC:FB:FB:01:FA:21", _elementTypes[2]),
 
-            new Element("Привет", _elementTypes[3]),
-            new Element("Hola", _elementTypes[3]),
-            new Element("Bonjour", _elementTypes[3]),
-            new Element("Hallo", _elementTypes[3]),
-            new Element("こんにちは", _elementTypes[3]),
+            new("Привет", _elementTypes[3]),
+            new("Hola", _elementTypes[3]),
+            new("Bonjour", _elementTypes[3]),
+            new("Hallo", _elementTypes[3]),
+            new("こんにちは", _elementTypes[3])
         };
     }
 
@@ -74,12 +75,12 @@
         _maxRows = _elementsByType.Values.Max(list => list.Count);
     }
 
-    private Dictionary<ElementType, List<string>> FilteredElementsByType => 
+    private Dictionary<ElementType, List<string>> FilteredElementsByType =>
         _elementsByType.ToDictionary(
             type => type.Key,
             type => type.Value.Where(e => string.IsNullOrWhiteSpace(_searchTerm) || e.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)).ToList()
         );
-    
+
 }
 
 <div class="container">
@@ -99,7 +100,7 @@
             <button type="button" class="btn btn-dark w-100" @onclick="ApplyFilters">Find</button>
         </div>
     </div>
-    
+
     <table class="table">
         <thead>
         <tr>
@@ -110,7 +111,7 @@
         </tr>
         </thead>
         <tbody>
-        @for (int row = 0; row < _maxRows; row++)
+        @for (var row = 0; row < _maxRows; row++)
         {
             <tr>
                 @foreach (var elementType in _elementTypes)
